@@ -1,37 +1,22 @@
-## Welcome to GitHub Pages
+## Seja bem vindo ao VIGA PREPRO
 
-You can use the [editor on GitHub](https://github.com/wmpjrufg/VIGA-PREPRO/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+<p align="justify">Nessa ferramenta você poderá verificar de forma automática uma <font color="blue">viga biapoiada de concreto pré-fabricado e protendido</font>. </br>
+</p>
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Autores:
 
-### Markdown
+<ul>
+  <li>Eng. Civil Gustavo Gonçalves Costa;</li>
+  <li>Prof. Dr. Wanderlei Malaquias Pereira Junior.</li>
+</ul>
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+<p align="justify">Para utilizar esta ferramenta basta acessar uma conta google e então salvar este arquivo no seu Google Drive. Ele poderá ser aberto na plataforma Google Colaboratory. </p>
 
-```markdown
-Syntax highlighted code block
+<p align="justify">De posse do <b>VIGA PREPRO</b> insira o arquivo fonte <b><font color="blue">PROTENSAO.py</font></b> pois o mesmo conterá as funções necessárias para o funcionamento da ferramenta.</p>
 
-# Header 1
-## Header 2
-### Header 3
+<p align="justify">A ferramenta já contém um exemplo e para rodar basta trocar os valores e ir executando as células do <i><b>Notebook</b></i>. 
+</p>
 
-- Bulleted
-- List
+<p align="justify">Veja o nosso vídeo tutorial!!!</p>
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/wmpjrufg/VIGA-PREPRO/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+<iframe width="560" height="315" src="https://www.youtube.com/embed/U6g7tYDxNvM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
