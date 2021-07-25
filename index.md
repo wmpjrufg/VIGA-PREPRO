@@ -1,7 +1,6 @@
 ## Seja bem vindo ao VIGA PREPRO
 
-<p align="justify">Nessa ferramenta você poderá verificar de forma automática uma <font color="blue">viga biapoiada de concreto pré-fabricado e protendido</font>. </br>
-</p>
+<p align="justify">Nessa ferramenta você poderá verificar de forma automática uma <font color="blue">viga biapoiada de concreto pré-fabricado e protendido</font>.</p>
 
 Autores:
 
