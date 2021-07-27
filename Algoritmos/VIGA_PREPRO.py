@@ -43,145 +43,6 @@ def PROP_GEOMETRICA(B_W, H):
     W_INF = I_C / Y_INF 
     return A_C, I_C, Y_SUP, Y_INF, W_SUP, W_INF
 
-def TENSAO_INICIAL(TIPO_PROT, TIPO_ACO, F_PK, F_YK):
-    """
-    Esta função determina a tensão inicial de protensão e a carga ini-
-    cial de protensão.
-
-    Entrada:
-    TIPO_PROT  | Protensão utilizada                                  |       | string    
-               |   'PRE' - Peça pré tracionada                        |       | 
-               |   'POS' - Peça pós tracionada                        |       |  
-    TIPO_ACO   | Tipo de aço                                          |       | string
-               |   'RN' - Relaxação normal                            |       |
-               |   'RB' - Relaxação baixa                             |       |
-    F_PK       | Tensão última característica do aço                  | kN/m² | float
-    F_YK       | Tensão de escoamento característica do aço           | kN/m² | float   
-
-    Saída:
-    SIGMA_PIT0 | Tensão inicial de protensão                          | kN/m² | float
-    
-    """
-    if TIPO_PROT == 'PRE':
-        if TIPO_ACO == 'RN':
-            SIGMA_PIT0 = min(0.77 * F_PK, 0.90 * F_YK)
-        elif TIPO_ACO == 'RB':
-            SIGMA_PIT0 = min(0.77 * F_PK, 0.85 * F_YK)       
-    elif TIPO_PROT == 'POS':
-        if TIPO_ACO == 'RN':
-            SIGMA_PIT0 = min(0.74 * F_PK, 0.87 * F_YK)
-        elif TIPO_ACO == 'RB':
-            SIGMA_PIT0 = min(0.74 * F_PK, 0.82 * F_YK)
-    return SIGMA_PIT0
-
-def ESFORCOS(Q, L, L_PINI, L_PINF):
-    """
-    Esta função determina os esforços atuantes na viga biapoiada.
-    
-    Entrada:
-    Q           | Carga lineramente distribuida      | kN/m    | float
-    L           | Comprimento da viga                | m       | float
-    L_PINI
-    L_PINF
-
-    Saída:
-    M          | Momento atuante no meio da viga    | kNm     | float
-    M_APINI
-    M_APINF
-    V           | Cortante atuante no apoio da viga  | kN      | float
-    """
-    # Momento no meio do vão
-    M_MV = Q * (L ** 2) / 8
-    # Momento no apoio nas condições iniciais e finais
-    M_APINI = (Q * L / 2)* L_PINI - (Q * L_PINI / 2) * (L_PINI / 2)
-    M_APINF = (Q * L / 2)* L_PINF - (Q * L_PINF / 2) * (L_PINF / 2)
-    # Cortanto nos apoios
-    V_AP = Q * L / 2 
-    return M_MV, M_APINI, M_APINF, V_AP 
-
-def TENSOES_NORMAIS(P_I, A_C, E_P, W_INF, W_SUP, DELTA_P, DELTA_G1, DELTA_G2, DELTA_G3, DELTA_Q1, DELTA_Q2, PSI_Q1, M_G1 ,M_G2, M_G3 , M_Q1, M_Q2):
-    """
-    Esta função determina a tensão normal nos bordos inferior e superior da peça.
-    
-    Entrada:
-    P_I         | Carga de protensão considerando as perdas         | kN      | float
-    A_C         | Área da  seção transversal da viga                | m²      | float
-    E_P         | Excentricidade de protensão                       | m       | float 
-    W_SUP       | Modulo de resistência superior                    | m³      | float
-    W_INF       | Modulo de resistência inferior                    | m³      | float
-    DELTA_      | Coeficientes parciais de segurança (G,Q,P)        |         | float
-    PSI_Q1      | Coeficiente parcial de segurança carga Q_1        |         | float
-    M_          | Momentos caracteristicos da peça (G,Q)            | kNm     | float  
-        
-    Saída:
-    SIGMA_INF   | Tensão normal fibra inferior                      | kN/m²   | float
-    SIGMA_SUP   | Tensão normal fibra superior                      | kN/m²   | float
-    """
-    # Tensão normal fibras inferiores
-    # Parcela da protensão
-    AUX_PINF =  DELTA_P * (P_I / A_C + P_I * E_P / W_INF) 
-    # Parcela da carga permanente de PP
-    AUX_G1INF = -1 * DELTA_G1 * M_G1 / W_INF 
-    # Parcela da carga permanente da capa
-    AUX_G2INF = -1 * DELTA_G2 * M_G2 / W_INF
-    # Parcela da carga permanente do revestimento
-    AUX_G3INF = -1 * DELTA_G3 * M_G3 / W_INF
-    # Parcela da carga acidental de utilização
-    AUX_Q1INF = -1 * DELTA_Q1 * PSI_Q1 * M_Q1 / W_INF
-    # Parcela da carga acidental de montagem da peça
-    AUX_Q2INF = -1 * DELTA_Q2 * M_Q2 / W_INF
-    # Total para parte inferior
-    SIGMA_INF = AUX_PINF + (AUX_G1INF + AUX_G2INF + AUX_G3INF ) + (AUX_Q1INF + AUX_Q2INF)
-    # Tensão normal fibras Superior
-    # Parcela da protensão
-    AUX_PSUP =  DELTA_P * (P_I / A_C - P_I * E_P / W_SUP) 
-    # Parcela da carga permanente de PP
-    AUX_G1SUP = 1 * DELTA_G1 * M_G1 / W_SUP 
-    # Parcela da carga permanente da capa
-    AUX_G2SUP = 1 * DELTA_G2 * M_G2 / W_SUP
-    # Parcela da carga permanente do revestimento
-    AUX_G3SUP = 1 * DELTA_G3 * M_G3 / W_SUP
-    # Parcela da carga acidental de utilização
-    AUX_Q1SUP = 1 * DELTA_Q1 * PSI_Q1 * M_Q1 / W_SUP
-    # Parcela da carga acidental de montagem da peça
-    AUX_Q2SUP = 1 * DELTA_Q2 * M_Q2 / W_SUP
-    # Total para parte inferior
-    SIGMA_SUP = AUX_PSUP + (AUX_G1SUP + AUX_G2SUP + AUX_G3SUP) + (AUX_Q1SUP + AUX_Q2SUP)
-    return SIGMA_INF, SIGMA_SUP
-
-def VERIFICA_TENSAO_NORMAL_ATO_PROTENSÃO(SIGMA_INF, SIGMA_SUP, SIGMA_TRACMAX, SIGMA_COMPMAX):
-    """
-    Esta função verifica a restrição de tensão normal em peças estruturais conforme
-    disposto na seção 17.2.4.3.2 da NBR 6118.
-    
-    Entrada:
-    SIGMA_INF       | Tensão normal fibra inferior                      | kN/m²   | float
-    SIGMA_SUP       | Tensão normal fibra superior                      | kN/m²   | float
-    SIGMA_TRACMAX   | Tensão normal máxima na tração                    | kN/m²   | float
-    SIGMA_COMPMAX   | Tensão normal máxima na compressão                | kN/m²   | float
-
-    Saída:
-    G_0             | Valor da restrição análise bordo inferior         |         | float
-    G_1             | Valor da restrição análise bordo superior         |         | float
-    """
-    # Análise bordo inferior
-    if SIGMA_INF >= 0:
-        SIGMA_MAX = SIGMA_COMPMAX
-        SIGMA = SIGMA_INF
-    else:
-        SIGMA_MAX = SIGMA_TRACMAX
-        SIGMA = np.abs(SIGMA_INF)
-    G_0 = (SIGMA / SIGMA_MAX) - 1 
-    # Análise bordo superior
-    if SIGMA_SUP >= 0:
-        SIGMA_MAX = SIGMA_COMPMAX
-        SIGMA = SIGMA_SUP
-    else:
-        SIGMA_MAX = SIGMA_TRACMAX
-        SIGMA = np.abs(SIGMA_SUP)
-    G_1 = (SIGMA / SIGMA_MAX) - 1 
-    return G_0, G_1  
-
 def FATOR_BETA1(TEMPO, CIMENTO):
     """
     Esta função calcula o valor de BETA_1 que representa a função de 
@@ -304,7 +165,170 @@ def PROP_MATERIAL(F_CK, TEMPO, CIMENTO, AGREGADO):
     F_CKJ *= 1E3
     F_CK *= 1E3
     [E_CIJ, E_CSJ] = MODULO_ELASTICIDADE_CONCRETO(AGREGADO, F_CK, F_CKJ)
-    return  F_CKJ, F_CTMJ, F_CTKINFJ, F_CTKSUPJ, E_CIJ, E_CSJ   
+    return  F_CKJ, F_CTMJ, F_CTKINFJ, F_CTKSUPJ, E_CIJ, E_CSJ 
+
+def TENSAO_INICIAL(TIPO_PROT, TIPO_ACO, F_PK, F_YK):
+    """
+    Esta função determina a tensão inicial de protensão e a carga ini-
+    cial de protensão.
+
+    Entrada:
+    TIPO_PROT  | Protensão utilizada                                  |       | string    
+               |   'PRE' - Peça pré tracionada                        |       | 
+               |   'POS' - Peça pós tracionada                        |       |  
+    TIPO_ACO   | Tipo de aço                                          |       | string
+               |   'RN' - Relaxação normal                            |       |
+               |   'RB' - Relaxação baixa                             |       |
+    F_PK       | Tensão última característica do aço                  | kN/m² | float
+    F_YK       | Tensão de escoamento característica do aço           | kN/m² | float   
+
+    Saída:
+    SIGMA_PIT0 | Tensão inicial de protensão                          | kN/m² | float
+    
+    """
+    if TIPO_PROT == 'PRE':
+        if TIPO_ACO == 'RN':
+            SIGMA_PIT0 = min(0.77 * F_PK, 0.90 * F_YK)
+        elif TIPO_ACO == 'RB':
+            SIGMA_PIT0 = min(0.77 * F_PK, 0.85 * F_YK)       
+    elif TIPO_PROT == 'POS':
+        if TIPO_ACO == 'RN':
+            SIGMA_PIT0 = min(0.74 * F_PK, 0.87 * F_YK)
+        elif TIPO_ACO == 'RB':
+            SIGMA_PIT0 = min(0.74 * F_PK, 0.82 * F_YK)
+    return SIGMA_PIT0
+
+def COMPRIMENTO_TRANSFERENCIA (PHI_L, F_YK, F_CTKINFJ, ETA_1, ETA_2, SIGMA_PI, H):
+    """
+    Esta função calcula o comprimento de tranferência da armadura L_P
+
+    Entrada:
+    PHI_L      | Diâmetro da armadura                                 | m      | float
+    F_YK       | Tensão de escoamento característica do aço           | kN/m²  | float
+    F_CTKINFJ  |                                                      |        | float
+    ETA_1      |                                                      |        | float
+    ETA_2      |                                                      |        | float
+    SIGMA_PI   |                                                      |        | float
+    H
+
+    Saída:
+    L_P 
+    """ 
+    F_YD = F_YK / 1.15
+    F_CTD = F_CTKINFJ / 1.4
+    F_BPD = ETA_1 * ETA_2 * F_CTD
+    # Comprimento de ancoragem básico para cordoalhas
+    L_BP = (7 * PHI_L * F_YD) / (36 * F_BPD)
+    # Comprimento básico de transferência para cordoalhas não gradual
+    L_BPT = (0.625 * L_BP ) * (SIGMA_PI/ F_YD)
+    AUXL_P = np.sqrt(H ** 2 + (0.6 * L_BPT) ** 2) 
+    L_P = max(AUXL_P, L_BPT)
+    return L_P
+
+def ESFORCOS(Q, L, L_P):
+    """
+    Esta função determina os esforços atuantes na viga biapoiada.
+    
+    Entrada:
+    Q           | Carga lineramente distribuida      | kN/m    | float
+    L           | Comprimento da viga                | m       | float
+    L_P
+
+    Saída:
+    M          | Momento atuante no meio da viga    | kNm     | float
+    M_AP
+    V          | Cortante atuante no apoio da viga  | kN      | float
+    """
+    # Momento no meio do vão
+    M_MV = Q * (L ** 2) / 8
+    # Momento no apoio nas condições iniciais e finais
+    M_AP = (Q * L / 2) * L_P - (Q * L_P / 2) * (L_P / 2)
+    # Cortanto nos apoios
+    V_AP = Q * L / 2 
+    return M_MV, M_AP, V_AP 
+
+def TENSOES_NORMAIS(P_I, A_C, E_P, W_INF, W_SUP, DELTA_P, DELTA_G1, DELTA_G2, DELTA_G3, DELTA_Q1, DELTA_Q2, PSI_Q1, M_G1, M_G2, M_G3, M_Q1, M_Q2):
+    """
+    Esta função determina a tensão normal nos bordos inferior e superior da peça.
+    
+    Entrada:
+    P_I         | Carga de protensão considerando as perdas         | kN      | float
+    A_C         | Área da  seção transversal da viga                | m²      | float
+    E_P         | Excentricidade de protensão                       | m       | float 
+    W_SUP       | Modulo de resistência superior                    | m³      | float
+    W_INF       | Modulo de resistência inferior                    | m³      | float
+    DELTA_      | Coeficientes parciais de segurança (G,Q,P)        |         | float
+    PSI_Q1      | Coeficiente parcial de segurança carga Q_1        |         | float
+    M_          | Momentos caracteristicos da peça (G,Q)            | kNm     | float  
+        
+    Saída:
+    SIGMA_INF   | Tensão normal fibra inferior                      | kN/m²   | float
+    SIGMA_SUP   | Tensão normal fibra superior                      | kN/m²   | float
+    """
+    # Tensão normal fibras inferiores
+    # Parcela da protensão
+    AUX_PINF =  DELTA_P * (P_I / A_C + P_I * E_P / W_INF) 
+    # Parcela da carga permanente de PP
+    AUX_G1INF = -1 * DELTA_G1 * M_G1 / W_INF 
+    # Parcela da carga permanente da capa
+    AUX_G2INF = -1 * DELTA_G2 * M_G2 / W_INF
+    # Parcela da carga permanente do revestimento
+    AUX_G3INF = -1 * DELTA_G3 * M_G3 / W_INF
+    # Parcela da carga acidental de utilização
+    AUX_Q1INF = -1 * DELTA_Q1 * PSI_Q1 * M_Q1 / W_INF
+    # Parcela da carga acidental de montagem da peça
+    AUX_Q2INF = -1 * DELTA_Q2 * M_Q2 / W_INF
+    # Total para parte inferior
+    SIGMA_INF = AUX_PINF + (AUX_G1INF + AUX_G2INF + AUX_G3INF ) + (AUX_Q1INF + AUX_Q2INF)
+    # Tensão normal fibras Superior
+    # Parcela da protensão
+    AUX_PSUP =  DELTA_P * (P_I / A_C - P_I * E_P / W_SUP) 
+    # Parcela da carga permanente de PP
+    AUX_G1SUP = 1 * DELTA_G1 * M_G1 / W_SUP 
+    # Parcela da carga permanente da capa
+    AUX_G2SUP = 1 * DELTA_G2 * M_G2 / W_SUP
+    # Parcela da carga permanente do revestimento
+    AUX_G3SUP = 1 * DELTA_G3 * M_G3 / W_SUP
+    # Parcela da carga acidental de utilização
+    AUX_Q1SUP = 1 * DELTA_Q1 * PSI_Q1 * M_Q1 / W_SUP
+    # Parcela da carga acidental de montagem da peça
+    AUX_Q2SUP = 1 * DELTA_Q2 * M_Q2 / W_SUP
+    # Total para parte inferior
+    SIGMA_SUP = AUX_PSUP + (AUX_G1SUP + AUX_G2SUP + AUX_G3SUP) + (AUX_Q1SUP + AUX_Q2SUP)
+    return SIGMA_INF, SIGMA_SUP
+
+def VERIFICA_TENSAO_NORMAL_ATO_PROTENSÃO(SIGMA_INF, SIGMA_SUP, SIGMA_TRACMAX, SIGMA_COMPMAX):
+    """
+    Esta função verifica a restrição de tensão normal em peças estruturais conforme
+    disposto na seção 17.2.4.3.2 da NBR 6118.
+    
+    Entrada:
+    SIGMA_INF       | Tensão normal fibra inferior                      | kN/m²   | float
+    SIGMA_SUP       | Tensão normal fibra superior                      | kN/m²   | float
+    SIGMA_TRACMAX   | Tensão normal máxima na tração                    | kN/m²   | float
+    SIGMA_COMPMAX   | Tensão normal máxima na compressão                | kN/m²   | float
+
+    Saída:
+    G_0             | Valor da restrição análise bordo inferior         |         | float
+    G_1             | Valor da restrição análise bordo superior         |         | float
+    """
+    # Análise bordo inferior
+    if SIGMA_INF >= 0:
+        SIGMA_MAX = SIGMA_COMPMAX
+        SIGMA = SIGMA_INF
+    else:
+        SIGMA_MAX = SIGMA_TRACMAX
+        SIGMA = np.abs(SIGMA_INF)
+    G_0 = (SIGMA / SIGMA_MAX) - 1 
+    # Análise bordo superior
+    if SIGMA_SUP >= 0:
+        SIGMA_MAX = SIGMA_COMPMAX
+        SIGMA = SIGMA_SUP
+    else:
+        SIGMA_MAX = SIGMA_TRACMAX
+        SIGMA = np.abs(SIGMA_SUP)
+    G_1 = (SIGMA / SIGMA_MAX) - 1 
+    return G_0, G_1   
 
 def PERDA_DESLIZAMENTO_ANCORAGEM(P_IT0, SIGMA_PIT0, A_SCP, L_0, DELTA_ANC, E_SCP):
     """
@@ -925,29 +949,3 @@ def ABERTURA_FISSURAS(ALFA_E, P_IINF, A_2, M_SDMAX, D, X_2, I_2, DIAMETRO_ARMADU
     W_FISSURA = min(W_1, W_2)
     return W_FISSURA
 
-def COMPRIMENTO_TRANSFERENCIA (PHI_L, F_YK, F_CTKINFJ, ETA_1, ETA_2, SIGMA_PI, H):
-    """
-    Esta função calcula o comprimento de tranferência da armadura L_P
-
-    Entrada:
-    PHI_L      | Diâmetro da armadura                                 | m      | float
-    F_YK       | Tensão de escoamento característica do aço           | kN/m²  | float
-    F_CTKINFJ  |                  |         | float
-    ETA_1      |                  |         | float
-    ETA_2      |                  |         | float
-    SIGMA_PI      |                  |         | float
-    H
-
-    Saída:
-    L_P 
-    """ 
-    F_YD = F_YK / 1.15
-    F_CTD = F_CTKINFJ / 1.4
-    F_BPD = ETA_1 * ETA_2 * F_CTD
-    # Comprimento de ancoragem básico para cordoalhas
-    L_BP = (7 * PHI_L * F_YD) / (36 * F_BPD)
-    # Comprimento básico de transferência para cordoalhas não gradual
-    L_BPT = (0.625 * L_BP ) * (SIGMA_PI/ F_YD)
-    AUXL_P = np.sqrt(H ** 2 + (0.6 * L_BPT) ** 2) 
-    L_P = max(AUXL_P, L_BPT)
-    return L_P
