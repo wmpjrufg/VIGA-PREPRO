@@ -106,7 +106,7 @@ def TENSOES_NORMAIS(P_I, A_C, E_P, W_INF, W_SUP, DELTA_P, DELTA_G1, DELTA_G2, DE
     Entrada:
     P_I         | Carga de protensão considerando as perdas         | kN      | float
     A_C         | Área da  seção transversal da viga                | m²      | float
-    E_P         | Excentricidade de protensão                       | m²      | float 
+    E_P         | Excentricidade de protensão                       | m       | float 
     W_SUP       | Modulo de resistência superior                    | m³      | float
     W_INF       | Modulo de resistência inferior                    | m³      | float
     DELTA_      | Coeficientes parciais de segurança (G,Q,P)        |         | float
