@@ -732,16 +732,16 @@ def TENSAO_ACO(E_SCP, EPSILON, EPSILON_P, EPSILON_Y, F_P, F_Y):
     um valor de deformação.
 
     Entrada:
-    E_SCP       | Módulo de elasticidade do aço protendido        | MPa   | float
+    E_SCP       | Módulo de elasticidade do aço protendido        | kN/m² | float
     EPSILON     | Deformação correspondente a tensão SIGMA 
     desejada                                                      |       | float
     EPSILON_P   | Deformação última do aço                        |       | float
     EPSILON_Y   | Deformação escoamento do aço                    |       | float
-    F_Y         | Tensão de escoamento do aço                     | MPa   | float
-    F_P         | Tensão última do aço                            | MPa   | float
+    F_Y         | Tensão de escoamento do aço                     | kN/m² | float
+    F_P         | Tensão última do aço                            | kN/m² | float
     
     Saída:
-    SIGMA       | Tensão correspondente a deformação Deformação   | kN/cm²| float
+    SIGMA       | Tensão correspondente a deformação Deformação   | kN/m² | float
     """
     # Determinação da tensão SIGMA correspodente a deformação EPSILON
     if EPSILON < (F_Y / E_SCP) :
@@ -749,28 +749,25 @@ def TENSAO_ACO(E_SCP, EPSILON, EPSILON_P, EPSILON_Y, F_P, F_Y):
     elif EPSILON >= (F_Y / E_SCP):
         AUX = (F_P - F_Y) / (EPSILON_P - EPSILON_Y)
         SIGMA = F_Y + AUX * (EPSILON - EPSILON_Y)
-    SIGMA = SIGMA / 10
     return SIGMA
 
 def DEFORMACAO_ACO(E_SCP, SIGMA, EPSILON_P, EPSILON_Y, F_P, F_Y):
     """
     Esta função determina a deformação da armadura de protensão a partir de 
-    um valor de tensão
+    um valor de tensão.
 
     Entrada:
-    E_SCP       | Módulo de elasticidade do aço protendido        | MPa   | float
-    SIGMA       | Tensão correspondente a tensão EPSILON desejada | kN/cm²| float
+    E_SCP       | Módulo de elasticidade do aço protendido        | kN/m² | float
+    SIGMA       | Tensão correspondente a tensão EPSILON desejada | kN/m² | float
     EPSILON_P   | Deformação última do aço                        |       | float
     EPSILON_Y   | Deformação escoamento do aço                    |       | float
-    F_Y         | Tensão de escoamento do aço                     | MPa   | float
-    F_P         | Tensão última do aço                            | MPa   | float
+    F_Y         | Tensão de escoamento do aço                     | kN/m² | float
+    F_P         | Tensão última do aço                            | kN/m² | float
     
     Saída:
-    EPSILON     | Deformação correspondente a tensão SIGMA 
-    desejada                                                      |       | float
+    EPSILON     | Deformação correspondente a tensão SIGMA        |       | float
     """
     # Determinação da deformação EPSILON correspodente a tensão SIGMA
-    SIGMA = SIGMA * 10
     if (SIGMA / E_SCP) < (F_Y / E_SCP):      
         EPSILON = SIGMA / E_SCP
     elif (SIGMA / E_SCP) >= (F_Y / E_SCP):
@@ -778,54 +775,53 @@ def DEFORMACAO_ACO(E_SCP, SIGMA, EPSILON_P, EPSILON_Y, F_P, F_Y):
         EPSILON = (SIGMA - F_Y) / AUX + EPSILON_Y
     return EPSILON
 
-def AREA_ACO_FNS_RETANGULAR_SIMPLES(TIPO_CONCRETO, M_D, F_CK, B_W, D, E_SCP, SIGMA, EPSILON_P, EPSILON_Y, F_P, F_Y):
+def AREA_ACO_FNS_RETANGULAR_SIMPLES(TIPO_CONCRETO, M_SD, F_CK, B_W, D, E_SCP, SIGMA, EPSILON_P, EPSILON_Y, F_P, F_Y):
     """
-    Esta função determina a área de aço em elementos de concreto quando submeti-
-    do a um momento fletor M_SD
+    Esta função determina a área de aço em elementos de concreto quando submetido a um momento fletor M_SD
     
-    TIPO_CONCRETO|                                                 |       |string
-                 |       'CP' - Concreto protendido                |       |
-                 |       'CA' - Concreto armado                    |       |
-    M_D          | Momento de cálculo                              | kN.cm | float
-    F_CK         | Resistência característica à compressão         | MPa   | float
-    B_W          | Largura da viga                                 | cm    | float  
-    D            | Altura útil da seção                            | cm    | float
-    E_SCP        | Módulo de elasticidade do aço protendido        | MPa   | float
-    SIGMA        | Tensão correspondente a tensão EPSILON desejada | kN/cm²| float
-    EPSILON_P    | Deformação última do aço                        |       | float
-    EPSILON_Y    | Deformação escoamento do aço                    |       | float
-    F_Y          | Tensão de escoamento do aço                     | MPa   | float
-    F_P          | Tensão última do aço                            | MPa   | float
+    TIPO_CONCRETO  | Defina se é concreto protendido ou armado                      |       | string
+                   |       'CP' - Concreto protendido                               |       |
+                   |       'CA' - Concreto armado                                   |       |
+    M_SD           | Momento de cálculo                                             | kN.m  | float
+    F_CK           | Resistência característica à compressão                        | kN/m² | float
+    B_W            | Largura da viga                                                | m     | float  
+    D              | Altura útil da seção                                           | m     | float
+    E_SCP          | Módulo de elasticidade do aço protendido                       | kN/m² | float
+    SIGMA          | Tensão correspondente a tensão EPSILON desejada                | kN/m² | float
+    EPSILON_P      | Deformação última do aço                                       |       | float
+    EPSILON_Y      | Deformação escoamento do aço                                   |       | float
+    F_Y            | Tensão de escoamento do aço                                    | kN/m² | float
+    F_P            | Tensão última do aço                                           | kN/m² | float
 
     Saída:
-    X            | Linha neutra da seção medida da parte externa
-                   comprimida ao CG                                | cm    | float  
-    Z            | Braço de alvanca                                | cm    | float    
-    A_S          | Área de aço necessária na seção                 | cm²   | float
-    EPSILON_S    | Deformação do aço                               |       | float
-    EPSILON_C    | Deformação do concreto                          |       | float
+    X              | Linha neutra da seção medida da parte externa comprimida ao CG | m     | float  
+    Z              | Braço de alvanca                                               | m     | float    
+    A_S            | Área de aço necessária na seção                                | m²    | float
+    EPSILON_S      | Deformação do aço                                              |       | float
+    EPSILON_C      | Deformação do concreto                                         |       | float
     """
     # Determinação dos fatores de cálculo de X e A_S
+    F_CK /= 1E3
     if F_CK >  50:
         LAMBDA = 0.80 - ((F_CK - 50) / 400)
         ALPHA_C = (1.00 - ((F_CK - 50) / 200)) * 0.85
-        EPSILON_C2 = 2 + 0.085 * (F_CK - 50) ** 0.53
+        EPSILON_C2 = 2.0 + 0.085 * (F_CK - 50) ** 0.53
         EPSILON_C2 = EPSILON_C2 / 1000
-        EPSILON_CU = 2.6 + 35 * ((90 - F_CK)/100) ** 4
+        EPSILON_CU = 2.6 + 35.0 * ((90 - F_CK) / 100) ** 4
         EPSILON_CU = EPSILON_CU / 1000
         KX_23 = EPSILON_CU / (EPSILON_CU + 10 / 1000)
         KX_34 = 0.35
     else:
         LAMBDA = 0.80
         ALPHA_C = 0.85
-        EPSILON_C2 = 2 / 1000
+        EPSILON_C2 = 2.0 / 1000
         EPSILON_CU = 3.5 / 1000
         KX_23 = EPSILON_CU / (EPSILON_CU + 10 / 1000)
-        KX_34 = 0.35
+        KX_34 = 0.45
     # Linhas neutra X
+    F_CK *= 1E3
     F_CD = F_CK / 1.40
-    F_CD = F_CD / 10
-    PARTE_1 = M_D / (B_W * ALPHA_C * F_CD)
+    PARTE_1 = M_SD / (B_W * ALPHA_C * F_CD)
     NUMERADOR = D - np.sqrt(D ** 2 - 2 * PARTE_1)
     DENOMINADOR = LAMBDA
     X = NUMERADOR / DENOMINADOR
@@ -849,31 +845,21 @@ def AREA_ACO_FNS_RETANGULAR_SIMPLES(TIPO_CONCRETO, M_D, F_CK, B_W, D, E_SCP, SIG
         F_YD = TENSAO_ACO(E_SCP, EPSILON_ST, EPSILON_P, EPSILON_Y, F_P, F_Y)
     elif TIPO_CONCRETO == 'CA':
         F_YD = F_Y / 1.15
-        F_YD = F_YD / 10
-    A_S = M_D / (Z * F_YD)
+    A_S = M_SD / (Z * F_YD)
     return X, EPSILON_S, EPSILON_C, Z, A_S
 
-def MOMENTO_MINIMO(W_0, F_CK):
+def MOMENTO_MINIMO(W_INF, F_CTKSUPJ):
     """
-    Esta função calcula o momento mínimo para a área de aço mínima 
+    Esta função calcula o momento mínimo para gerar a área de aço mínima.
 
     Entrada:
-    W_0          | Módulo de resistência da seção transversal 
-    bruta de concreto, relativo à fibra mais tracionada            | cm³   | float
-    F_CK         | Resistência característica à compressão         | MPa   | float
+    W_INF      | Modulo de resistência inferior                         | m³     | float
+    F_CTKSUPJ  | Resistência média caracteristica a tração sup idade J  | kN/m²  | float
 
     Saída:
-    M_MIN        | Momento mínimo para armadura mínima             | kN.cm | float
+    M_MIN      | Momento mínimo para armadura mínima                    | kN.m  | float
     """
-    # Resistência à tração do concreto
-    if F_CK <= 50:
-        F_CTM = 0.3 * F_CK ** (2 / 3)
-    else:
-        F_CTM = 2.12 * np.log(1 + 0.11 * F_CK)
-    F_CTKSUP = 1.3 * F_CTM
-    F_CTKSUP = F_CTKSUP / 10
-    # Momento mínimo
-    M_MIN = 0.80 * W_0 * F_CTKSUP
+    M_MIN = 0.80 * W_INF * F_CTKSUPJ
     return M_MIN
 
 def ARMADURA_ASCP_ELS(A_C, W_INF, E_P, PSI1_Q1, PSI2_Q1, M_G1, M_G2, M_G3, M_Q1, SIGMA_PI, F_CTKINFJ):
