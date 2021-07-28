@@ -27,7 +27,7 @@ _**Índice**_
 
 _**Contato**_
 
-<p align="justify">Caso deseje entrar em contato para maiores informações, informar algum tipo de falha ou participar do projeto fale com: <font color="blue">wanderlei_junior@ufcat.edu.br</font>.</p>
+<p align="justify">Caso deseje entrar em contato para maiores informações, informar algum tipo de falha ou participar do projeto fale com: <font face="Verdana" color="blue">wanderlei_junior@ufcat.edu.br</font>.</p>
 
 
 **_Disclaimer_**
