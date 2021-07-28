@@ -198,7 +198,7 @@ def TENSAO_INICIAL(TIPO_PROT, TIPO_ACO, F_PK, F_YK):
             SIGMA_PIT0 = min(0.74 * F_PK, 0.82 * F_YK)
     return SIGMA_PIT0
 
-def COMPRIMENTO_TRANSFERENCIA (PHI_L, F_YK, F_CTKINFJ, ETA_1, ETA_2, SIGMA_PI, H):
+def COMPRIMENTO_TRANSFERENCIA(PHI_L, F_YK, F_CTKINFJ, ETA_1, ETA_2, SIGMA_PI, H):
     """
     Esta função calcula o comprimento de tranferência da armadura L_P
 
@@ -640,9 +640,9 @@ def PERDA_RETRACAO_CONCRETO(U, ABAT):
     SIGMA_PIT0  | Tensão inicial de protensão                            | kN/m² | float
       
     Saída:
-    DELTAPERC   | Perda percentual de protensão                         | %     | float
-    P_IT1       | Carga final de protensão                              | kN    | float
-    SIGMA_PIT1  | Tensão inicial de protensão                           | kN/m² | float
+    DELTAPERC   | Perda percentual de protensão                          | %     | float
+    P_IT1       | Carga final de protensão                               | kN    | float
+    SIGMA_PIT1  | Tensão inicial de protensão                            | kN/m² | float
     """
     # Cálculo da defomração específica EPSILON_1S
     EPSILON_1S = -8.09 + (U / 15) - (U ** 2 / 2284) - (U ** 3 / 133765) + (U ** 4 / 7608150)
@@ -668,63 +668,107 @@ def PERDA_RETRACAO_CONCRETO(U, ABAT):
     DELTAPERC = (DELTAP / P_IT0) * 100
     return DELTAPERC, P_IT1, SIGMA_PIT1
 
-def VERIFICACAO_CISALHAMENTO(F_CK, B_W, D, A_SW, F_YK, TIPO_VC, M_SDMAX, P_I, A, W, E_P):
+def AREA_ACO_TRANSVERSAL_MODELO_I(ALPHA, P_I, V_SD, F_CTKINFJ, B_W, D, TIPO_CONCRETO, W_INF, A_C, E_P, M_SDMAX, F_CTMJ, F_YWK):
     """
-    Esta função verifica o valor dos parâmetors V_R2, V_SW e V_C para uma peça
-    de concreto armado / protendido.
+    Esta função verifica o valor da área de aço necessária para a peça de concreto.
 
     Entrada:
-    F_CK        | Resistência característica à compressão         | MPa   | float
-    F_YK        | Resistência característica do aço               | MPa   | float
-    B_W         | Largura da viga                                 | cm    | float  
-    D           | Altura útil da seção                            | cm    | float
-    A_SW        | Área de aço para cisalhamento                   | cm²/m | float
-    TIPO_VC     | #############                                   |       | string
-                |       'TRACAO'                                  |       |
-                |       'FS'                                      |       |
-                |       'FC'                                      |       |
-    M_SDMAX     | Momento de cálculo máximo                       | kN.cm | float
-    P_I         | Carga de protensão considerando as perdas       | kN    | float
-    A           | Área da seção transversal da viga               | cm²   | flot
-    E_P         | Excentricidade de protensão                     | cm²   | float 
-    W           | Modulo de resistência superior                  | cm³   | float
+    ALPHA          | Inclinação do cabo protendido                          | graus | float
+    P_I            | Carga de protensão considerando as perdas              | kN    | float    
+    V_SD           | Cortante de cálculo                                    | kN    | float
+    F_CTKINFJ      | Resistência média caracteristica a tração inf idade J  | kN/m² | float
+    B_W            | Largura da viga                                        | m     | float  
+    D              | Altura útil da seção                                   | m     | float
+    TIPO_CONCRETO  | Defina se é concreto protendido ou armado              |       | string
+                   |       'CP' - Concreto protendido                       |       |
+                   |       'CA' - Concreto armado                           |       |
+    W_INF          | Modulo de resistência inferior                         | m³    | float
+    A_C            | Área da  seção transversal da viga                     | m²    | float
+    E_P            | Excentricidade de protensão                            | m²    | float 
+    M_SDMAX        | Momento de cálculo máximo                              | kN.m  | float
+    F_CTMJ         | Resistência média caracteristica a tração idade J      | kN/m² | float
+    F_YWK          | Resistência característica do aço do estribo           | kN/m² | float
 
     Saída:
-    V_RD2       | Resitência da biela comprimida                  | kN    | float 
-    V_SW        | Resitência ao cisalhamento da armadura          | kN    | float
-    V_C         | Resitência ao cisalhamento do concreto          | kN    | float
+    V_C            | Resitência ao cisalhamento do concreto                 | kN    | float
+    V_SW           | Resitência ao cisalhamento da armadura                 | kN    | float    
+    A_SW           | Área de aço para cisalhamento                          | m²/m  | float
     """
-    # Força resistente da biela de compressão
-    ALFA_V2 = (1 - (F_CK / 250))
-    F_CD = F_CK / 1.40
-    F_CD = F_CD / 10
-    V_RD2 = 0.27 * ALFA_V2 * F_CD * B_W * D
-    # Força resistente da armadura de cisalhamento
-    F_YWD = (F_YK / 1.15) / 10
-    V_SW = A_SW * 0.9 * F_YWD * (np.sin (np.pi / 2) + np.cos (np.pi / 2))
-    # Força resistente do concreto
-    if F_CK <= 50:
-        F_CTM = 0.3 * F_CK ** (2 / 3)
-    else:
-        F_CTM = 2.12 * np.log(1 + 0.11 * F_CK)
-    F_CTKINF = 0.70 * F_CTM
-    F_CTD = F_CTKINF / 1.4 
-    F_CTD = F_CTD / 10
-    if TIPO_VC == 'TRACAO':
-        V_C = 0
-    elif TIPO_VC == 'FS':
-        V_C0 = 0.6 * F_CTD * B_W * D
+    # Contribuição do concreto na resistência
+    F_CTD = F_CTKINFJ / 1.40
+    V_C0 = 0.6 * F_CTD * B_W * D
+    if TIPO_CONCRETO == 'CA':
         V_C = V_C0
-    elif TIPO_VC == 'FC':
-        V_C0 = 0.6 * F_CTD * B_W * D
-        SIGMA = P_I / A + (P_I * E_P) / W
-        M_0 = 0.90 * W * SIGMA
+    elif TIPO_CONCRETO == 'CP':
+        # Correção do cisalhamento em função do esforço de protensão P_I
+        ALPHA *= np.pi / 180
+        N_P = P_I *np.cos(ALPHA)
+        V_P = P_I *np.sin(ALPHA)
+        V_SD -= 0.90 * V_P 
+        AUX = N_P / A_C + (N_P * E_P) / W_INF
+        M_0 = 0.90 * W_INF * AUX
+        # Cálculo V_C
         V_CCALC = V_C0 * (1 + M_0 / M_SDMAX)
-        if V_CCALC > 2 * V_C0:
+        if V_CCALC > (2 * V_C0):
             V_C = 2 * V_C0
         else:
             V_C = V_CCALC
-    return V_RD2, V_SW, V_C 
+    # Determinação da armadura
+    if V_C >= V_SD:
+        V_SW = 0
+        F_CTMJ /= 1E3
+        F_CTMJ /= 10
+        B_W *= 1E2
+        F_YWK /= 1E3
+        F_YWK /= 10
+        A_SW = (20 * F_CTMJ * B_W) / F_YWK
+        A_SW /= 1E4
+    else:
+        ALPHA_EST = np.pi / 2
+        V_SW = V_SD - V_C
+        F_YWK /= 1E3
+        F_YWK /= 10        
+        F_YWD = F_YWK / 1.15
+        D *= 1E2
+        AUX = 0.90 * D * F_YWD * (np.sin(ALPHA_EST) + np.cos(ALPHA_EST))
+        A_SW = V_SW / AUX
+        A_SW /= 1 / 1E2
+        A_SW /= 1E4
+    return V_C, V_SW, A_SW 
+
+def RESISTENCIA_BIELA_COMPRIMIDA(F_CK, B_W, D):
+    """
+    Esta função verifica o valor da resistência da biela comprimida V_RD2.
+
+    Entrada:
+    F_CK        | Resistência característica à compressão         | kN/m² | float
+    B_W         | Largura da viga                                 | m     | float  
+    D           | Altura útil da seção                            | m     | float
+    
+    Saída:
+    V_RD2       | Resitência da biela comprimida                  | kN    | float 
+    """
+    # Força resistente da biela de compressão
+    F_CK /= 1E3 
+    ALFA_V2 = (1 - (F_CK / 250))
+    F_CK *= 1E3 
+    F_CD = F_CK / 1.40
+    V_RD2 = 0.27 * ALFA_V2 * F_CD * B_W * D
+    return V_RD2
+
+def VERIFICA_BIELA_COMPRIMIDA(V_SD, V_MAX):
+    """
+    Esta função verifica a restrição do esforço na biela de compressão.
+    
+    Entrada:
+    V_SD       | Cortante de cálculo                               | kN    | float
+    V_MAX      | Cortante máximo permitido na biela de compressão  | kN    | float
+
+    Saída:
+    G_0        | Valor da restrição analisando o cisalhamento      |       | float
+    """
+    G_0 = (V_SD / V_MAX) - 1 
+    return G_0  
 
 def TENSAO_ACO(E_SCP, EPSILON, EPSILON_P, EPSILON_Y, F_P, F_Y):
     """
@@ -848,6 +892,20 @@ def AREA_ACO_FNS_RETANGULAR_SIMPLES(TIPO_CONCRETO, M_SD, F_CK, B_W, D, E_SCP, SI
     A_S = M_SD / (Z * F_YD)
     return X, EPSILON_S, EPSILON_C, Z, A_S
 
+def VERIFICA_ARMADURA_FLEXAO(A_SCP, A_SCPNEC):
+    """
+    Esta função verifica a restrição do esforço na biela de compressão.
+    
+    Entrada:
+    A_SCP      | Armadura de protensão da peça                      | m²    | float
+    A_SCPNEC   | Armadura de protensão necessária para peça         | m²    | float
+
+    Saída:
+    G_0        | Valor da restrição analisando a armadura de flexão |       | float
+    """
+    G_0 = (A_SCPNEC / A_SCP) - 1 
+    return G_0   
+
 def MOMENTO_MINIMO(W_INF, F_CTKSUPJ):
     """
     Esta função calcula o momento mínimo para gerar a área de aço mínima.
@@ -919,8 +977,8 @@ def ARMADURA_ASCP_ELU(A_C, W_INF, W_SUP, E_P, PSI1_Q1, PSI2_Q1, M_G1, M_G2, M_G3
     A_SCP1 = (LIMITE_COMP0 + AUX_2) / AUX_3
     return A_SCP0, A_SCP1
 
+"""
 def ABERTURA_FISSURAS(ALFA_E, P_IINF, A_2, M_SDMAX, D, X_2, I_2, DIAMETRO_ARMADURA, ETA_COEFICIENTE_ADERENCIA, E_SCP, F_CTM, RHO_R) :
-    """
     Esta função calcula a abertura de fissuras na peça 
 
     Entrada:
@@ -928,10 +986,113 @@ def ABERTURA_FISSURAS(ALFA_E, P_IINF, A_2, M_SDMAX, D, X_2, I_2, DIAMETRO_ARMADU
     W_INF       | Modulo de resistência inferior                         | m³      | float
     PSI1_Q1     | Coeficiente parcial de segurança PSI_1                 |         | float
     PSI2_Q1     | Coeficiente parcial de segurança PSI_2                 |         | float
-    """   
+  
     SIGMA_S = ALFA_E * (P_IINF / A_2) + ( ALFA_E * (M_SDMAX * (D - X_2) / I_2 ) )
     W_1 = (DIAMETRO_ARMADURA / 12.5 * ETA_COEFICIENTE_ADERENCIA) * (SIGMA_S / E_SCP) * 3 (SIGMA_S / F_CTM)
     W_2 = (DIAMETRO_ARMADURA / 12.5 * ETA_COEFICIENTE_ADERENCIA) * (SIGMA_S / E_SCP) * ((4 / RHO_R) + 45)
     W_FISSURA = min(W_1, W_2)
     return W_FISSURA
+"""
 
+def GEOMETRIC_PROPERTIES_STATE_I(H, B_F, B_W, H_F, A_SB, ALPHA_MOD, D):
+    A_C = (B_F - B_W) * H_F + B_W * H + A_SB * (ALPHA_MOD - 1)
+    X_I = ((B_F - B_W) * ((H_F ** 2) / 2) + B_W * ((H ** 2 ) / 2) + A_SB * (ALPHA_MOD - 1) * D) / A_C
+    I_I = ((B_F - B_W) * H_F ** 3) / 12 + (B_W * H ** 3) / 12 + (B_F - B_W) * H_F * (X_I - H_F / 2) ** 2 + B_W * H * (X_I - H / 2) ** 2 + A_SB * (ALPHA_MOD - 1) * (X_I - D) ** 2
+    return A_C, X_I, I_I
+
+def GEOMETRIC_PROPERTIES_STATE_II(H, B_F, B_W, H_F, A_SB, A_ST, ALPHA_MOD, D, D_L):
+    if B_F <= B_W:
+        A_1 = B_W / 2
+        A_2 = H_F * (B_F - B_W) + (ALPHA_MOD - 1) * A_ST + ALPHA_MOD * A_SB
+        A_3 = - D_L * (ALPHA_MOD - 1) * A_ST - D * ALPHA_MOD * A_SB - (H_F ** 2) / 2 * (B_F - B_W)
+        X_II = (-A_2 + np.sqrt(A_2 ** 2 - 4 * A_1 * A_3)) / (2 * A_1)
+    elif B_F > B_W:
+        A_1 = B_F / 2
+        A_2 = H_F * (0) + (ALPHA_MOD - 1) * A_ST + ALPHA_MOD * A_SB
+        A_3 = -D_L*(ALPHA_MOD - 1) * A_ST - D * ALPHA_MOD * A_SB - (H_F ** 2) / 2 * (0)
+        X_II = (- A_2 + (A_2 ** 2 - 4 * A_1 * A_3) ** 0.50) / (2 * A_1)
+        if X_II > H_F:
+            A_1 = B_W / 2
+            A_2 = H_F * (B_F - B_W) + (ALPHA_MOD - 1) * A_ST + ALPHA_MOD * A_SB
+            A_3 = - D_L * (ALPHA_MOD - 1) * A_ST - D * ALPHA_MOD * A_SB - (H_F ** 2) / 2 * (B_F - B_W)
+            X_II = (- A_2 + np.sqrt(A_2 ** 2 - 4 * A_1 * A_3)) / (2 * A_1)    
+    if X_II <= H_F:
+        I_II = (B_F * X_II ** 3) / 3 + ALPHA_MOD * A_SB * (X_II - D) ** 2 + (ALPHA_MOD - 1) * A_ST * (X_II - D_L) ** 2
+    else:
+        I_II = ((B_F - B_W) * H_F ** 3) / 12 + (B_W * X_II **3 ) / 3 + (B_F - B_W) * (X_II - H_F / 2) ** 2 + ALPHA_MOD * A_SB * (X_II - D) ** 2 + (ALPHA_MOD - 1) * A_ST * (X_II - D_L) ** 2
+    return X_II, I_II
+
+def BRANSON_INERTIA(M_R, M_D,I_I, I_II):
+    M_RMD = (M_R / M_D) ** 3
+    I_BRANSON = M_RMD * I_I + (1 - M_RMD) * I_II
+    return I_BRANSON
+
+def DISPLACEMENT(BEAM_TYPE, EI, P_K, L):
+    if BEAM_TYPE == 0:
+        DELTA = 5 * P_K * (L ** 4) * (1 / (384 * EI))
+    elif BEAM_TYPE == 1:
+        DELTA = 1 * P_K * (L ** 3) * (1 / (48 * EI))
+    return DELTA
+
+def AGGREGATE(AGGREGATE_TTYPE):
+    if AGGREGATE_TTYPE == 0:
+        ALPHA_E = 1.20
+    elif AGGREGATE_TTYPE == 1:
+        ALPHA_E = 1.00
+    elif AGGREGATE_TTYPE == 2:
+        ALPHA_E = 0.90
+    elif AGGREGATE_TTYPE == 3:
+        ALPHA_E = 0.70
+    return ALPHA_E
+
+def TANGENT_YOUNG_MODULUS(F_CK, AGGREGATE_TTYPE):
+    ALPHA_E = AGGREGATE(AGGREGATE_TTYPE)
+    if F_CK >= 20 and F_CK <= 50:
+        E_CI = ALPHA_E * 5600 * np.sqrt(F_CK)
+    elif F_CK > 50 and F_CK <= 90:
+        E_CI = 21.5E3 * ALPHA_E * (F_CK / 10 + 1.25) ** (1 / 3)
+    return E_CI
+
+def SECANT_YOUNG_MODULUS(F_CK, E_CI):
+    ALPHA_I = 0.80 + 0.20 * (F_CK / 80)
+    if ALPHA_I > 1.00:
+        ALPHA_I = 1.00
+    E_CS = ALPHA_I * E_CI
+    return E_CS
+
+def M_R_BENDING_MOMENT(GEOMETRIC_FACTOR, F_CT, H, X_I, I_I, P_I, A_C, W_INF, E_P):
+    if GEOMETRIC_FACTOR == 0:
+        ALPHA = 1.2
+    elif GEOMETRIC_FACTOR == 1:
+        ALPHA = 1.3
+    elif GEOMETRIC_FACTOR == 2:
+        ALPHA = 1.5
+    Y_T = H - X_I
+    AUX = (1 / A_C) + (E_P / W_INF)
+    M_0 = P_I * W_INF * AUX
+    M_R = M_0 + ALPHA * F_CT * (I_I / Y_T)
+    return M_R
+
+def EPSILON_COEFFICIENT(T):
+    if T < 70:
+        EPSILON = 0.68 * (0.996 ** T) * (T ** 0.32)
+    else:
+        EPSILON = 2
+    return EPSILON
+
+def TOTAL_DISPLACEMENT(DELTA_INITIAL, A_ST, B_W, D, T_INITIAL, T_END):
+    EPSILON_INITITAL = EPSILON_COEFFICIENT(T_INITIAL)
+    EPSILON_END = EPSILON_COEFFICIENT(T_END)
+    DELTA_EPSILON = EPSILON_END - EPSILON_INITITAL
+    PHO_L = A_ST / (B_W * D)
+    ALPHA_F = DELTA_EPSILON / (1 + PHO_L)
+    DELTA_TOTAL = DELTA_INITIAL * (1 + ALPHA_F)
+    return PHO_L, ALPHA_F, DELTA_TOTAL
+
+def VERIFICA_FLECHA(A_TOTAL, A_MAX):
+    """
+    Saída:
+    G_0        | Valor da restrição analisando o cisalhamento      |       | float
+    """
+    G_0 = (A_TOTAL / A_MAX) - 1 
+    return G_0  
