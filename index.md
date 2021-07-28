@@ -1,21 +1,35 @@
-## Seja bem vindo ao VIGA PREPRO
+<h1>Seja bem vindo ao Viga PREPRO</h1>
 
-<p align="justify">Nessa ferramenta você poderá verificar de forma automática uma <font color="blue">viga biapoiada de concreto pré-fabricado e protendido</font>.</p>
+<p align="justify">Nessa ferramenta você poderá verificar de forma automática uma vigas biapoiadas, pré-fabricas, protendidas, com cabos retilíneos e protensão limitada.</p>
 
-Autores:
+_**O projeto**_
 
-<ul>
-  <li>Eng. Civil Gustavo Gonçalves Costa;</li>
-  <li>Prof. Dr. Wanderlei Malaquias Pereira Junior.</li>
-</ul>
+<p align="justify">Este trabalho é fruto de uma pesquisa acadêmica (Projeto de pesquisa <b>PI02654-2018</b>) realizada com parceria de duas instituições de ensino: a UFCAT (Universidade Federal de Catalão) e UFG (Universidade Federal de Goiás).</p>
 
-<p align="justify">Para utilizar esta ferramenta basta acessar uma conta google e então salvar este arquivo no seu Google Drive. Ele poderá ser aberto na plataforma Google Colaboratory. </p>
+_**Desenvolvedores**_  
 
-<p align="justify">De posse do <b>VIGA PREPRO</b> insira o arquivo fonte <b><font color="blue">PROTENSAO.py</font></b> pois o mesmo conterá as funções necessárias para o funcionamento da ferramenta.</p>
+**_Scrum Master_**   
+- [Prof. Wanderlei Malaquias Pereira Junior](http://lattes.cnpq.br/2268506213083114)
+- Profa. Sylvia Regina Mesquisa de Almeida
 
-<p align="justify">A ferramenta já contém um exemplo e para rodar basta trocar os valores e ir executando as células do <i><b>Notebook</b></i>. 
-</p>
+**_Scrum Team_**    
+- Eng. Civil Gustavo Gonçalves Costa 
+- Eng. Civil Matheus Henrique Morato de Moraes
+- Eng. Civil Geraldo Magela Gonçalves Filho
 
-<p align="justify">Veja o nosso vídeo tutorial!!!</p>
+_**Índice**_   
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/U6g7tYDxNvM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+1.0 - Instalação  
+1.1 - [Como instalar](https://wmpjrufg.github.io/VIGA-PREPRO/CAP_1-1.html)  
+2.0 - VIGA PREPRO  
+2.1 - [Como utilizar o _framework_](https://wmpjrufg.github.io/VIGA-PREPRO/CAP_2-1.html)  
+
+
+_**Contato**_
+
+<p align="justify">Caso deseje entrar em contato para maiores informações, informar algum tipo de falha ou participar do projeto fale com: <font color="blue">wanderlei_junior@ufcat.edu.br</font>.</p>
+
+
+**_Disclaimer_**
+
+<p align="justify">Este projeto visa popularizar o conteúdo produzido em universidades, portanto os autores permitem o uso do mesmo sobre as ressalvas de uma licença MIT. Apesar de ser uma ferramenta já testada em pesquisa os autores não se responsabilizam pelo uso do mesmo em projetos comerciais.</p>
