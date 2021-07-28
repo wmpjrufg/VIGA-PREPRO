@@ -15,7 +15,7 @@ Caso esteja utilizando as funções do _framework_ Viga PREPRO utilize a seguint
 from VIGA_PREPRO import *
 ```
 
-Caso queira usar a nossa versão padrão [clique aqui]() para acessar a página do _framework_.
+Caso queira usar a nossa versão padrão [clique aqui](https://nbviewer.jupyter.org/github/wmpjrufg/VIGA-PREPRO/blob/gh-pages/VIGA_PREPRO.ipynb) para acessar a página do _framework_.
 
 <h3>Dados de entrada</h3>
 
